@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import logo from "../assets/WhatsApp Image 2025-08-28 at 16.18.41.jpeg"; // ensure file exists
+import { Link } from "react-router-dom"; // <-- import Link
+import logo from "../assets/Logo.png"; // ensure file exists
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -19,12 +20,23 @@ export default function Navbar() {
       transition={{ duration: 0.5 }}
       className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-sm shadow-md"
     >
-      <div className="container mx-auto px-6 py-5 flex items-center justify-between">
-        {/* Logo + Brand */}
-        <div className="flex items-center gap-3">
-          <img src={logo} alt="logo" className="h-14 w-14 object-contain" />
-          <span className="font-bold text-blue-900 text-xl">Mangalam Physiotheraphy</span>
-        </div>
+      <div className="container mx-auto px-4 py-1.5 flex items-center justify-between">
+        {/* Logo + Brand wrapped in Link to home */}
+        <Link to="/" className="flex items-center gap-1">
+          <img
+            src={logo}
+            alt="logo"
+            className="h-20 w-20 md:h-20 md:w-20 lg:h-30 lg:w-28 object-contain"
+          />
+          <div className="leading-tight">
+            <span className="block font-bold text-blue-900 text-lg sm:text-xl md:text-2xl lg:text-3xl">
+              MANGALAM
+            </span>
+            <span className="block text-blue-900 text-sm sm:text-base md:text-lg lg:text-xl">
+              Advanced Physiotherapy & Rehabilation Center
+            </span>
+          </div>
+        </Link>
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex gap-10 items-center">
@@ -41,12 +53,13 @@ export default function Navbar() {
             </motion.a>
           ))}
 
-          <a
-            href="#contact"
+          {/* Book button navigates to /appointment */}
+          <Link
+            to="/appointment"
             className="ml-3 px-5 py-2.5 rounded-full bg-blue-700 text-white font-medium shadow-md hover:bg-blue-800 transition"
           >
             Book
-          </a>
+          </Link>
         </nav>
 
         {/* Mobile Menu Toggle */}
@@ -77,12 +90,15 @@ export default function Navbar() {
                 {l.label}
               </a>
             ))}
-            <a
-              href="#contact"
+
+            {/* Mobile Book Appointment button */}
+            <Link
+              to="/appointment"
               className="inline-block mt-3 px-5 py-2.5 bg-blue-700 text-white rounded-full text-lg shadow-md hover:bg-blue-800 transition"
+              onClick={() => setOpen(false)}
             >
               Book Appointment
-            </a>
+            </Link>
           </div>
         </motion.div>
       )}
