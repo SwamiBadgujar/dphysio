@@ -1,15 +1,66 @@
+// Appointment.jsx
 import { useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Appointment() {
-  const [form, setForm] = useState({ name: "", email: "", number: "", date: "", message: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    date: "",
+    time: "",
+    message: "",
+  });
+  const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleSubmit = (e) => {
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSent(true);
-    setTimeout(() => setSent(false), 2500);
+
+    // ✅ Check required fields before sending
+    const { name, email, phone, date, time } = form;
+    if (!name || !email || !phone || !date || !time) {
+      toast.error("Please fill all required fields!");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await axios.post("http://localhost:5002/api/appointments", form, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      console.log("Appointment booked:", res.data);
+
+      toast.success(
+        `Appointment booked successfully! Confirmation email sent to ${form.email}`
+      );
+
+      setSent(true);
+      // Reset form
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        date: "",
+        time: "",
+        message: "",
+      });
+
+      setTimeout(() => setSent(false), 4000);
+    } catch (err) {
+      console.error("❌ Error booking appointment:", err);
+      toast.error(err.response?.data?.error || "Failed to book appointment.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,7 +84,7 @@ export default function Appointment() {
             value={form.name}
             onChange={handleChange}
             placeholder="Your Name"
-            className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition"
+            className="w-full p-4 border rounded-lg"
             required
           />
           <input
@@ -41,15 +92,16 @@ export default function Appointment() {
             value={form.email}
             onChange={handleChange}
             placeholder="Your Email"
-            className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition"
+            className="w-full p-4 border rounded-lg"
+            type="email"
             required
           />
           <input
-            name="number"
-            value={form.number}
+            name="phone"
+            value={form.phone}
             onChange={handleChange}
             placeholder="Your Phone Number"
-            className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition"
+            className="w-full p-4 border rounded-lg"
             required
           />
           <input
@@ -57,7 +109,15 @@ export default function Appointment() {
             name="date"
             value={form.date}
             onChange={handleChange}
-            className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition"
+            className="w-full p-4 border rounded-lg"
+            required
+          />
+          <input
+            type="time"
+            name="time"
+            value={form.time}
+            onChange={handleChange}
+            className="w-full p-4 border rounded-lg"
             required
           />
           <textarea
@@ -66,35 +126,21 @@ export default function Appointment() {
             onChange={handleChange}
             rows="4"
             placeholder="Additional Notes"
-            className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition"
+            className="w-full p-4 border rounded-lg"
           />
 
-          {/* Centered Send Button */}
-          <div className="flex justify-center mt-4">
-            <button
-              type="submit"
-              className="px-8 py-3 bg-blue-700 text-white font-medium rounded-full shadow-lg hover:bg-blue-800 transition"
-            >
-              {sent ? "Booked ✓" : "Book Appointment"}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className={`px-8 py-3 bg-blue-700 text-white font-medium rounded-full shadow-lg ${
+              loading ? "opacity-60 cursor-not-allowed" : ""
+            }`}
+          >
+            {sent ? "Booked ✓" : loading ? "Booking..." : "Book Appointment"}
+          </button>
         </form>
 
-        {/* Optional Contact Info */}
-        <div className="text-center mt-8 text-gray-700">
-          <p>
-            Or call us directly:{" "}
-            <a href="tel:+917744898939" className="text-blue-700 font-semibold">
-              +91 77448 98939
-            </a>
-          </p>
-          <p>
-            Email:{" "}
-            <a href="mailto:info@physiotherapyclinic.com" className="text-blue-700 font-semibold">
-              info@physiotherapyclinic.com
-            </a>
-          </p>
-        </div>
+        <ToastContainer position="top-right" autoClose={3000} />
       </div>
     </motion.section>
   );

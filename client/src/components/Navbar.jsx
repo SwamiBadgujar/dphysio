@@ -1,107 +1,104 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom"; // <-- import Link
-import logo from "../assets/Logo.png"; // ensure file exists
+import logo from "../assets/Logo.png";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const token = localStorage.getItem("doctorToken");
+
   const links = [
-    { label: "Home", href: "#home" },
+    { label: "Home", href: "/" },
     { label: "About", href: "#about" },
     { label: "Services", href: "#services" },
+    { label: "Testimonials", href: "#Testimonials" },
     { label: "Contact", href: "#contact" },
+    { label: "Appointment", href: "/appointment" },
   ];
 
   return (
-    <motion.header
-      initial={{ y: -80 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-sm shadow-md"
-    >
-      <div className="container mx-auto px-4 py-1.5 flex items-center justify-between">
-        {/* Logo + Brand wrapped in Link to home */}
-        <Link to="/" className="flex items-center gap-1">
+    <nav className="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md shadow-lg z-50 h-20">
+      <div className="container mx-auto px-4 h-full flex items-center justify-between">
+        {/* Logo + Clinic Name */}
+        <Link to="/" className="flex items-center space-x-2">
           <img
             src={logo}
-            alt="logo"
-            className="h-20 w-20 md:h-20 md:w-20 lg:h-30 lg:w-28 object-contain"
+            alt="Logo"
+            className="h-16 w-16 object-contain drop-shadow-md"
           />
-          <div className="leading-tight">
-            <span className="block font-bold text-blue-900 text-lg sm:text-xl md:text-2xl lg:text-3xl">
+          <div className="flex flex-col leading-tight">
+            <span className="text-2xl md:text-3xl font-extrabold text-blue-700 tracking-wide uppercase">
               MANGALAM
             </span>
-            <span className="block text-blue-900 text-sm sm:text-base md:text-lg lg:text-xl">
-              Advanced Physiotherapy & Rehabilation Center
+            <span className="text-lg md:text-xl font-semibold text-blue-600">
+              Physiotherapy
             </span>
           </div>
         </Link>
 
         {/* Desktop Menu */}
-        <nav className="hidden md:flex gap-10 items-center">
-          {links.map((l, i) => (
-            <motion.a
-              key={l.label}
-              href={l.href}
-              className="text-gray-700 text-base md:text-lg hover:text-blue-700 transition"
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.05 }}
+        <div className="hidden md:flex items-center space-x-8">
+          {links.map((link) => (
+            <Link
+              key={link.label}
+              to={link.href}
+              className="relative text-gray-700 font-medium text-lg hover:text-blue-600 transition duration-200 group"
             >
-              {l.label}
-            </motion.a>
+              {link.label}
+              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+            </Link>
           ))}
 
-          {/* Book button navigates to /appointment */}
+          {/* Doctor Login button */}
           <Link
-            to="/appointment"
-            className="ml-3 px-5 py-2.5 rounded-full bg-blue-700 text-white font-medium shadow-md hover:bg-blue-800 transition"
+            to="/doctor/login"
+            className="px-5 py-2 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition"
           >
-            Book
+            Doctor Login
           </Link>
-        </nav>
+        </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-gray-800"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle menu"
+          className="md:hidden p-2 rounded-md hover:bg-gray-100 transition"
+          onClick={() => setOpen(!open)}
         >
-          {open ? <X size={26} /> : <Menu size={26} />}
+          {open ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {open && (
         <motion.div
-          className="md:hidden bg-white shadow-md"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="md:hidden bg-white/95 shadow-lg"
         >
-          <div className="px-6 py-5 space-y-4">
-            {links.map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                className="block text-gray-700 text-lg py-1"
+          <div className="flex flex-col space-y-4 p-6">
+            {links.map((link) => (
+              <Link
+                key={link.label}
+                to={link.href}
+                className="text-gray-700 hover:text-blue-600 font-medium text-lg"
                 onClick={() => setOpen(false)}
               >
-                {l.label}
-              </a>
+                {link.label}
+              </Link>
             ))}
 
-            {/* Mobile Book Appointment button */}
+            {/* Doctor Login button */}
             <Link
-              to="/appointment"
-              className="inline-block mt-3 px-5 py-2.5 bg-blue-700 text-white rounded-full text-lg shadow-md hover:bg-blue-800 transition"
+              to="/doctor/login"
               onClick={() => setOpen(false)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-center font-semibold shadow-md hover:bg-blue-700 transition"
             >
-              Book Appointment
+              Doctor Login
             </Link>
           </div>
         </motion.div>
       )}
-    </motion.header>
+    </nav>
   );
 }

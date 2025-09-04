@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -8,9 +9,14 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import Chatbot from "./components/Chatbot";
 import Testimonials from "./components/Testimonials";
-import Appointment from "./components/Appointment"; // new page for booking
+import Appointment from "./components/Appointment"; // ✅ default export
+import DoctorLogin from "./components/DoctorLogin";
+import DoctorAppointments from "./components/DoctorAppointments"; // ✅ corrected import
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
+  const [token, setToken] = useState(localStorage.getItem("doctorToken") || "");
+
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900 font-sans">
@@ -51,9 +57,19 @@ export default function App() {
             />
 
             {/* Appointment Page */}
+            <Route path="/appointment" element={<Appointment />} />
+
+            {/* Doctor Login Page */}
+            <Route path="/doctor/login" element={<DoctorLogin setToken={setToken} />} />
+
+            {/* Doctor Dashboard (Protected) */}
             <Route
-              path="/appointment"
-              element={<Appointment />}
+              path="/doctor"
+              element={
+                <ProtectedRoute>
+                  <DoctorAppointments token={token} />
+                </ProtectedRoute>
+              }
             />
           </Routes>
         </main>
