@@ -9,8 +9,8 @@ import mongoose from 'mongoose';
 // Routes
 import publicRoutes from './Routes/public.js';
 import appointmentRoutes from './Routes/appointmentRoutes.js';
-import doctorRoutes from './Routes/doctorRoutes.js';
-import contactRoutes from './Routes/contactRoutes.js'; // 👈 NEW route for contact form
+import doctorRoutes from './Routes/doctorRoutes.js'; 
+import enquiryRoutes from './Routes/enquiriesRoutes.js'; // 👈 NEW route for contact form
 
 // Utils
 import { getAIReply } from './utils/ai.js';
@@ -56,7 +56,7 @@ app.get('/api/health', (_req, res) =>
 app.use('/api', publicRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/doctor', doctorRoutes);
-app.use('/api/contacts', contactRoutes); // 👈 NEW contact route
+app.use('/api/enquiries', enquiryRoutes);
 
 // --- Socket.io Chatbot ---
 io.on('connection', (socket) => {

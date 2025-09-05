@@ -19,7 +19,7 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.email || !form.number) {
+    if (!form.name || !form.email || !form.number || !form.message) {
       toast.error("Please fill all required fields!");
       return;
     }
@@ -27,19 +27,19 @@ export default function Contact() {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5002/api/contacts", // 👈 Matches your updated index.js
+        "http://localhost:5002/api/enquiries", // ✅ Updated to enquiries
         form,
         { headers: { "Content-Type": "application/json" } }
       );
 
       toast.success(`✅ Message sent! We'll reply to ${form.email}`);
-      console.log("📩 Contact saved:", res.data);
+      console.log("📩 Enquiry saved:", res.data);
 
       // Reset form
       setForm({ name: "", email: "", number: "", message: "" });
     } catch (err) {
-      console.error("❌ Contact form error:", err);
-      toast.error(err.response?.data?.error || "Failed to send message.");
+      console.error("❌ Enquiry form error:", err);
+      toast.error(err.response?.data?.error || "Failed to send enquiry.");
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export default function Contact() {
         {/* Section Header */}
         <div className="text-center mb-10">
           <h2 className="text-3xl font-extrabold text-blue-900 mb-2">
-            How May We Help You;
+            How May We Help You?
           </h2>
           <p className="text-gray-600">
             Reach out to us for appointments or any inquiries. We’ll get back to
@@ -101,6 +101,7 @@ export default function Contact() {
             rows="5"
             placeholder="Your Message"
             className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition"
+            required
           />
 
           <div className="flex justify-center mt-4">
