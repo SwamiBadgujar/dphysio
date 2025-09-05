@@ -6,11 +6,15 @@ import morgan from 'morgan';
 import cors from 'cors';
 import mongoose from 'mongoose';
 
+// Routes
 import publicRoutes from './Routes/public.js';
 import appointmentRoutes from './Routes/appointmentRoutes.js';
-import doctorRoutes from './Routes/doctorRoutes.js'; 
+import doctorRoutes from './Routes/doctorRoutes.js';
+import contactRoutes from './Routes/contactRoutes.js'; // 👈 NEW route for contact form
+
+// Utils
 import { getAIReply } from './utils/ai.js';
-import transporter from './utils/email.js'; // ✅ add transporter check
+import transporter from './utils/email.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -26,18 +30,35 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
 
-// --- Health check & welcome ---
+// --- Env check logs ---
+console.log("🔍 [Server] EMAIL_USER:", process.env.EMAIL_USER ? "Set" : "Not set");
+console.log("🔍 [Server] CLINIC_EMAIL:", process.env.CLINIC_EMAIL ? "Set" : "Not set");
+console.log("🔍 [Server] MONGO_URI:", process.env.MONGO_URI ? "Set" : "Not set");
+console.log("🔍 [Server] JWT_SECRET:", process.env.JWT_SECRET ? "Set" : "Not set");
+
+// --- Validate env variables ---
+const requiredEnvVars = ['EMAIL_USER', 'EMAIL_PASS', 'CLINIC_EMAIL', 'MONGO_URI'];
+const missingEnvVars = requiredEnvVars.filter((v) => !process.env[v]);
+if (missingEnvVars.length > 0) {
+  console.error(`❌ [Server] Missing environment variables: ${missingEnvVars.join(', ')}`);
+  process.exit(1);
+}
+
+// --- Health check ---
 app.get('/', (_req, res) => {
   res.send(`✅ Backend is running for ${process.env.DOCTOR_NAME || 'our clinic'}`);
 });
-app.get('/api/health', (_req, res) => res.json({ ok: true, uptime: process.uptime() }));
+app.get('/api/health', (_req, res) =>
+  res.json({ ok: true, uptime: process.uptime() })
+);
 
 // --- API Routes ---
 app.use('/api', publicRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/doctor', doctorRoutes);
+app.use('/api/contacts', contactRoutes); // 👈 NEW contact route
 
-// --- Socket.io (AI chat) ---
+// --- Socket.io Chatbot ---
 io.on('connection', (socket) => {
   console.log('⚡ Socket connected:', socket.id);
 
@@ -66,7 +87,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log('⚡ Socket disconnected:', socket.id));
 });
 
-// --- Start server after MongoDB connection ---
+// --- Start Server after DB connection ---
 const PORT = Number(process.env.PORT || 5002);
 
 mongoose
@@ -74,13 +95,14 @@ mongoose
   .then(async () => {
     console.log('✅ Connected to MongoDB');
 
-    // ✅ Verify email transporter before starting
     try {
       await transporter.verify();
       console.log(`📧 Email transporter is ready to send messages`);
-      console.log(`   ➡️ Clinic Email: ${process.env.EMAIL_USER}`);
+      console.log(`   ➡️ Sender Email: ${process.env.EMAIL_USER}`);
+      console.log(`   ➡️ Clinic Email: ${process.env.CLINIC_EMAIL}`);
     } catch (err) {
       console.error('❌ Email transporter verification failed:', err.message);
+      console.error('⚠️ Server will start, but emails may fail. Check EMAIL_USER and EMAIL_PASS.');
     }
 
     server.listen(PORT, () =>

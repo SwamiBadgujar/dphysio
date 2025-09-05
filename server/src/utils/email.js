@@ -1,21 +1,21 @@
-// server/src/utils/email.js
 import nodemailer from "nodemailer";
 
-// ✅ Transporter with Gmail SMTP
+// Create transporter
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
-  secure: true, // true for 465
+  secure: true, // Use SSL for Gmail
   auth: {
-    user: process.env.EMAIL_USER, // Gmail sender
-    pass: process.env.EMAIL_PASS, // Gmail App Password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
-// ✅ Verify transporter at startup
+// Verify transporter at startup
 transporter.verify((error, success) => {
   if (error) {
-    console.error("❌ [Email] Transporter verification failed:", error.message);
+    console.error("❌ [Email] Transporter verification failed!");
+    console.error(error); // full error object
   } else {
     console.log("✅ [Email] Transporter verified & ready");
     console.log(`📧 Sender Gmail: ${process.env.EMAIL_USER}`);
@@ -23,14 +23,29 @@ transporter.verify((error, success) => {
   }
 });
 
-/**
- * ✅ Send a single email (with full debug logs)
- */
+// Send a single email
 export const sendEmail = async ({ to, subject, text, html }) => {
-  console.log("\n📨 [sendEmail] Preparing email...");
+  console.log("\n📨 [sendEmail] Preparing to send...");
   console.log(`   From: ${process.env.EMAIL_USER}`);
   console.log(`   To: ${to}`);
   console.log(`   Subject: ${subject}`);
+
+  // Validate inputs
+  if (!process.env.EMAIL_USER) {
+    throw new Error("EMAIL_USER not configured");
+  }
+  if (!to) {
+    throw new Error("Recipient email is missing");
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+    throw new Error(`Invalid recipient email: ${to}`);
+  }
+  if (!subject) {
+    throw new Error("Email subject is missing");
+  }
+  if (!text && !html) {
+    throw new Error("Email content is missing");
+  }
 
   try {
     const info = await transporter.sendMail({
@@ -41,36 +56,61 @@ export const sendEmail = async ({ to, subject, text, html }) => {
       html,
     });
 
-    console.log("✅ [sendEmail] Email sent successfully!");
+    console.log("✅ [sendEmail] Success!");
     console.log("   Accepted:", info.accepted);
     console.log("   Rejected:", info.rejected);
     console.log("   Response:", info.response);
-
     return info;
   } catch (err) {
-    console.error("❌ [sendEmail] Error sending email:", err.message);
-    return null;
+    console.error("❌ [sendEmail] Error while sending!");
+    console.error(err); // full SMTP error object
+    throw err;
   }
 };
 
-/**
- * ✅ Send appointment emails (patient + clinic)
- */
+// Send appointment emails (patient + clinic)
 export const sendAppointmentEmails = async (appointment, clinicEmail) => {
   const { patientName, patientEmail, date, time, phone, message } = appointment;
 
-  console.log("\n📌 [sendAppointmentEmails] Triggered");
-  console.log("   ➡️ Patient Email:", patientEmail || "N/A");
-  console.log("   ➡️ Clinic Email:", clinicEmail);
+  console.log("\n📌 [sendAppointmentEmails] Starting email workflow...");
+  console.log("   Appointment data:", {
+    patientName,
+    patientEmail,
+    phone,
+    date,
+    time,
+    message,
+    clinicEmail,
+  });
 
   try {
-    // --- Patient confirmation email ---
+    // Validate inputs
+    if (!clinicEmail) {
+      throw new Error("Clinic email is missing");
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clinicEmail)) {
+      throw new Error(`Invalid clinic email format: ${clinicEmail}`);
+    }
+    if (!patientName || !date || !time) {
+      throw new Error("Missing required appointment details");
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      throw new Error(`Invalid date format: ${date}`);
+    }
+    if (!/^\d{2}:\d{2}$/.test(time)) {
+      throw new Error(`Invalid time format: ${time}`);
+    }
+
+    // Patient confirmation
     if (patientEmail) {
-      console.log("📨 [sendAppointmentEmails] Sending email to patient...");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(patientEmail)) {
+        throw new Error(`Invalid patient email format: ${patientEmail}`);
+      }
+      console.log("➡️ [sendAppointmentEmails] Sending confirmation to patient:", patientEmail);
       await sendEmail({
         to: patientEmail,
         subject: "✅ Appointment Confirmation - Mangalam Physiotherapy",
-        text: `Hello ${patientName},\n\nYour appointment is confirmed.\n\n📅 Date: ${date}\n⏰ Time: ${time}\n\nThank you!`,
+        text: `Hello ${patientName}, your appointment is confirmed for ${date} at ${time}.`,
         html: `
           <h2>Appointment Confirmation</h2>
           <p>Hello <b>${patientName}</b>,</p>
@@ -79,19 +119,19 @@ export const sendAppointmentEmails = async (appointment, clinicEmail) => {
             <li><b>Date:</b> ${date}</li>
             <li><b>Time:</b> ${time}</li>
           </ul>
-          <p>📍 Mangalam Physiotherapy</p>
         `,
       });
+      console.log("✅ [sendAppointmentEmails] Patient confirmation sent");
     } else {
-      console.log("ℹ️ [sendAppointmentEmails] No patient email provided — skipping patient email.");
+      console.log("ℹ️ [sendAppointmentEmails] No patient email provided, skipping.");
     }
 
-    // --- Clinic email ---
-    console.log("📨 [sendAppointmentEmails] Sending email to clinic...");
+    // Clinic notification
+    console.log("➡️ [sendAppointmentEmails] Sending notification to clinic:", clinicEmail);
     await sendEmail({
       to: clinicEmail,
       subject: `📅 New Appointment - ${patientName}`,
-      text: `New appointment booked:\nPatient: ${patientName}\nPhone: ${phone}\nEmail: ${patientEmail || "N/A"}\nDate: ${date}\nTime: ${time}\nMessage: ${message || "N/A"}`,
+      text: `Patient: ${patientName}\nPhone: ${phone}\nEmail: ${patientEmail || "N/A"}\nDate: ${date}\nTime: ${time}\nMessage: ${message || "N/A"}`,
       html: `
         <h2>New Appointment</h2>
         <ul>
@@ -104,11 +144,16 @@ export const sendAppointmentEmails = async (appointment, clinicEmail) => {
         </ul>
       `,
     });
+    console.log("✅ [sendAppointmentEmails] Clinic notification sent");
 
-    console.log("✅ [sendAppointmentEmails] Finished. Emails attempted to patient & clinic.");
+    console.log("🎉 [sendAppointmentEmails] All emails sent successfully!");
+    return true;
   } catch (err) {
-    console.error("❌ [sendAppointmentEmails] Failed:", err.message);
+    console.error("❌ [sendAppointmentEmails] Failed to complete workflow!");
+    console.error(err); // full error object
+    throw err;
   }
 };
 
+// Export transporter for debugging if needed
 export default transporter;

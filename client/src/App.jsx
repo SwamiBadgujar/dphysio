@@ -1,3 +1,4 @@
+// client/src/App.jsx
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -9,9 +10,9 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import Chatbot from "./components/Chatbot";
 import Testimonials from "./components/Testimonials";
-import Appointment from "./components/Appointment"; // ✅ default export
+import Appointment from "./components/Appointment";
 import DoctorLogin from "./components/DoctorLogin";
-import DoctorAppointments from "./components/DoctorAppointments"; // ✅ corrected import
+import DoctorAppointments from "./components/DoctorAppointments";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
@@ -43,7 +44,7 @@ export default function App() {
                     <Services />
                   </section>
 
-                  <section id="Testimonials" className="py-20 bg-gray-100 container mx-auto px-6">
+                  <section id="testimonials" className="py-20 bg-gray-100 container mx-auto px-6">
                     <h2 className="text-4xl font-bold text-center mb-10">Testimonials</h2>
                     <Testimonials />
                   </section>

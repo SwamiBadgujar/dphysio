@@ -1,15 +1,17 @@
+// client/src/components/DoctorLogin.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // for redirect
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function DoctorLogin({ setToken }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false); // ✅ remember me state
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // On mount, check if credentials are saved
+  // Prefill saved credentials
   useEffect(() => {
     const savedEmail = localStorage.getItem("doctorEmail");
     const savedPassword = localStorage.getItem("doctorPassword");
@@ -22,9 +24,12 @@ export default function DoctorLogin({ setToken }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
     if (!email || !password) {
       setError("Please enter both email and password");
+      setLoading(false);
       return;
     }
 
@@ -34,12 +39,12 @@ export default function DoctorLogin({ setToken }) {
         password,
       });
 
+      console.log("🔑 Login response:", res.data);
+
       if (res.data.token) {
-        // Save token in localStorage
         localStorage.setItem("doctorToken", res.data.token);
         setToken(res.data.token);
 
-        // ✅ Save credentials if remember is checked
         if (remember) {
           localStorage.setItem("doctorEmail", email);
           localStorage.setItem("doctorPassword", password);
@@ -48,17 +53,21 @@ export default function DoctorLogin({ setToken }) {
           localStorage.removeItem("doctorPassword");
         }
 
-        // Redirect to doctor dashboard
+        // ✅ Navigate to the correct protected route
         navigate("/doctor");
+      } else {
+        setError("Login failed: no token received");
       }
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("❌ Login error:", err.response?.data || err.message);
       setError(err.response?.data?.error || "Invalid email or password");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100">
+    <div className="min-h-screen flex justify-center items-center bg-gray-100 pt-24">
       <form
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-xl shadow-md w-96"
@@ -100,9 +109,14 @@ export default function DoctorLogin({ setToken }) {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+          disabled={loading}
+          className={`w-full py-2 rounded-lg text-white font-semibold ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600 transition"
+          }`}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </div>

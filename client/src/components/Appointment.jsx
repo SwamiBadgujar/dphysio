@@ -1,4 +1,4 @@
-// Appointment.jsx
+// client/src/components/Appointment.jsx
 import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
@@ -23,40 +23,26 @@ export default function Appointment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Check required fields before sending
-    const { name, email, phone, date, time } = form;
-    if (!name || !email || !phone || !date || !time) {
+    if (!form.name || !form.email || !form.phone || !form.date || !form.time) {
       toast.error("Please fill all required fields!");
       return;
     }
 
     setLoading(true);
-
     try {
       const res = await axios.post("http://localhost:5002/api/appointments", form, {
         headers: { "Content-Type": "application/json" },
       });
 
-      console.log("Appointment booked:", res.data);
-
-      toast.success(
-        `Appointment booked successfully! Confirmation email sent to ${form.email}`
-      );
+      // ✅ Fixed template literal
+      toast.success(`Appointment booked! Confirmation email sent to ${form.email}`);
+      console.log("✅ Appointment response:", res.data);
 
       setSent(true);
-      // Reset form
-      setForm({
-        name: "",
-        email: "",
-        phone: "",
-        date: "",
-        time: "",
-        message: "",
-      });
-
+      setForm({ name: "", email: "", phone: "", date: "", time: "", message: "" });
       setTimeout(() => setSent(false), 4000);
     } catch (err) {
-      console.error("❌ Error booking appointment:", err);
+      console.error("❌ Booking error:", err);
       toast.error(err.response?.data?.error || "Failed to book appointment.");
     } finally {
       setLoading(false);
@@ -79,55 +65,12 @@ export default function Appointment() {
           onSubmit={handleSubmit}
           className="bg-white shadow-lg rounded-xl p-8 flex flex-col gap-4"
         >
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Your Name"
-            className="w-full p-4 border rounded-lg"
-            required
-          />
-          <input
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Your Email"
-            className="w-full p-4 border rounded-lg"
-            type="email"
-            required
-          />
-          <input
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            placeholder="Your Phone Number"
-            className="w-full p-4 border rounded-lg"
-            required
-          />
-          <input
-            type="date"
-            name="date"
-            value={form.date}
-            onChange={handleChange}
-            className="w-full p-4 border rounded-lg"
-            required
-          />
-          <input
-            type="time"
-            name="time"
-            value={form.time}
-            onChange={handleChange}
-            className="w-full p-4 border rounded-lg"
-            required
-          />
-          <textarea
-            name="message"
-            value={form.message}
-            onChange={handleChange}
-            rows="4"
-            placeholder="Additional Notes"
-            className="w-full p-4 border rounded-lg"
-          />
+          <input name="name" value={form.name} onChange={handleChange} placeholder="Your Name" className="w-full p-4 border rounded-lg" required />
+          <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Your Email" className="w-full p-4 border rounded-lg" required />
+          <input name="phone" value={form.phone} onChange={handleChange} placeholder="Your Phone Number" className="w-full p-4 border rounded-lg" required />
+          <input type="date" name="date" value={form.date} onChange={handleChange} className="w-full p-4 border rounded-lg" required />
+          <input type="time" name="time" value={form.time} onChange={handleChange} className="w-full p-4 border rounded-lg" required />
+          <textarea name="message" value={form.message} onChange={handleChange} rows="4" placeholder="Additional Notes" className="w-full p-4 border rounded-lg" />
 
           <button
             type="submit"
