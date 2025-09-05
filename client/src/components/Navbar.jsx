@@ -32,7 +32,7 @@ export default function Navbar() {
               MANGALAM
             </span>
             <span className="text-lg md:text-xl font-semibold text-blue-600">
-              Physiotherapy
+              Physiotherapy Center
             </span>
           </div>
         </Link>

@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 export default function Contact() {
   const [form, setForm] = useState({
     name: "",
-    email: "",
     number: "",
     message: "",
   });
@@ -19,24 +17,25 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name || !form.email || !form.number || !form.message) {
-      toast.error("Please fill all required fields!");
+    // ✅ Only check name & number
+    if (!form.name || !form.number) {
+      toast.error("Please fill in your name and phone number!");
       return;
     }
 
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5002/api/enquiries", // ✅ Updated to enquiries
+        "http://localhost:5002/api/enquiries",
         form,
         { headers: { "Content-Type": "application/json" } }
       );
 
-      toast.success(`✅ Message sent! We'll reply to ${form.email}`);
+      toast.success("Message sent successfully!", { icon: "✅" });
       console.log("📩 Enquiry saved:", res.data);
 
       // Reset form
-      setForm({ name: "", email: "", number: "", message: "" });
+      setForm({ name: "", number: "", message: "" });
     } catch (err) {
       console.error("❌ Enquiry form error:", err);
       toast.error(err.response?.data?.error || "Failed to send enquiry.");
@@ -78,15 +77,6 @@ export default function Contact() {
             required
           />
           <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Your Email"
-            className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition"
-            required
-          />
-          <input
             name="number"
             value={form.number}
             onChange={handleChange}
@@ -99,9 +89,8 @@ export default function Contact() {
             value={form.message}
             onChange={handleChange}
             rows="5"
-            placeholder="Your Message"
+            placeholder="Your Message (optional)"
             className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-300 outline-none transition"
-            required
           />
 
           <div className="flex justify-center mt-4">
@@ -138,8 +127,6 @@ export default function Contact() {
             </a>
           </p>
         </div>
-
-        <ToastContainer position="top-right" autoClose={3000} />
       </div>
     </motion.section>
   );

@@ -144,11 +144,17 @@ export default function DoctorDashboard({ token }) {
               />
               <div>
                 <p><strong>Name:</strong> {item.name}</p>
-                <p><strong>Email:</strong> {item.email || "N/A"}</p>
+
+                {/* Email only for appointments */}
+                {type === "appointments" && (
+                  <p><strong>Email:</strong> {item.email || "N/A"}</p>
+                )}
+
                 <p>
                   <strong>Phone:</strong>{" "}
                   {type === "appointments" ? item.phone : item.number}
                 </p>
+
                 {type === "appointments" ? (
                   <>
                     <p><strong>Date:</strong> {item.date}</p>
@@ -156,8 +162,12 @@ export default function DoctorDashboard({ token }) {
                     <p><strong>Note:</strong> {item.note || "N/A"}</p>
                   </>
                 ) : (
-                  <p><strong>Message:</strong> {item.message}</p>
+                  <p>
+                    <strong>Message:</strong>{" "}
+                    {item.message && item.message.trim() !== "" ? item.message : "N/A"}
+                  </p>
                 )}
+
                 <p>
                   <strong>Created:</strong>{" "}
                   {new Date(item.createdAt).toLocaleString()}

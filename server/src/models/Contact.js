@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
 
-const contactSchema = new mongoose.Schema(
+const enquirySchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true },
-    number: { type: String, required: true }, // 👈 match frontend form
-    message: { type: String, required: true },
+    number: { type: String, required: true },
+    message: { type: String, required: false }, // ✅ optional now
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Enquiry", contactSchema); // 👈 rename to Enquiry
+export default mongoose.model("Enquiry", enquirySchema);

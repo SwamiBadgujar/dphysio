@@ -1,6 +1,8 @@
 // client/src/App.jsx
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -77,9 +79,22 @@ export default function App() {
 
         <Footer />
 
+        {/* Floating Chatbot */}
         <div className="fixed bottom-6 right-6 z-50">
           <Chatbot />
         </div>
+
+        {/* ✅ Global ToastContainer (only once in whole app) */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="colored"
+        />
       </div>
     </Router>
   );
