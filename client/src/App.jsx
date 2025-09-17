@@ -37,12 +37,12 @@ export default function App() {
                   </section>
 
                   <section id="about" className="py-20 container mx-auto px-6">
-                    <h2 className="text-4xl font-bold text-center mb-10">About Us</h2>
+                    <h2 className="text-4xl font-bold text-center mb-10"></h2>
                     <About />
                   </section>
 
                   <section id="services" className="py-20 bg-gray-100 container mx-auto px-6">
-                    <h2 className="text-4xl font-bold text-center mb-10">Our Services</h2>
+                    <h2 className="text-4xl font-bold text-center mb-10"></h2>
                     <Services />
                   </section>
 

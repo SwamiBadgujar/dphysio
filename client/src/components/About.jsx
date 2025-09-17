@@ -50,7 +50,7 @@ function ClinicSlider({ images, interval = 3000 }) {
         </AnimatePresence>
       </div>
 
-      {/* Arrows (responsive size) */}
+      {/* Arrows */}
       <button
         onClick={handlePrev}
         className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 md:p-2 shadow hover:bg-white"
@@ -89,6 +89,16 @@ export default function About() {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
     >
+      {/* 🏷 About Us Title */}
+      <div className="text-center py-12 bg-white/0">
+        <h1 className="text-4xl md:text-4xl font-extrabold text-gray-800">
+          About <span className="text-blue-700">Us</span>
+        </h1>
+        <p className="text-gray-600 text-lg mt-2">
+          Know more about our Doctor and Clinic
+        </p>
+      </div>
+
       {/* 👨‍⚕️ Doctor Section */}
       <div className="relative bg-gradient-to-r from-blue-50 via-white to-blue-100 min-h-screen flex items-center py-20">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
