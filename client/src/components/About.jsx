@@ -1,31 +1,24 @@
 // client/src/components/About.jsx
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react"; 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import doctorImg from "../assets/about.jpeg";
 import clinicImg1 from "../assets/clinic.jpeg";
 import clinicImg2 from "../assets/Clinic2.jpeg";
 import clinicImg3 from "../assets/Clinic3.jpeg";
 import clinicImg4 from "../assets/Clinic4.jpeg";
 
-// ✅ Auto-slide + Manual + Swipe
+// ✅ Auto-slide + Manual navigation
 function ClinicSlider({ images, interval = 3000 }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      handleNext();
-    }, interval);
+    const timer = setInterval(() => handleNext(), interval);
     return () => clearInterval(timer);
   }, [index]);
 
-  const handlePrev = () => {
-    setIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const handleNext = () => {
-    setIndex((prev) => (prev + 1) % images.length);
-  };
+  const handlePrev = () => setIndex((prev) => (prev - 1 + images.length) % images.length);
+  const handleNext = () => setIndex((prev) => (prev + 1) % images.length);
 
   return (
     <motion.div
@@ -34,17 +27,17 @@ function ClinicSlider({ images, interval = 3000 }) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Large image container with white frame */}
-      <div className="relative w-full h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-white/70 backdrop-blur-md p-4">
+      {/* Image */}
+      <div className="relative w-full h-[250px] sm:h-[350px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-white/70 backdrop-blur-md p-3">
         <AnimatePresence mode="wait">
           <motion.img
             key={index}
             src={images[index]}
             alt={`Clinic view ${index + 1}`}
             className="w-full h-full object-cover rounded-xl"
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
+            exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.6 }}
           />
         </AnimatePresence>
@@ -53,24 +46,24 @@ function ClinicSlider({ images, interval = 3000 }) {
       {/* Arrows */}
       <button
         onClick={handlePrev}
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 md:p-2 shadow hover:bg-white"
+        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 sm:p-2 shadow hover:bg-white"
       >
-        <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-blue-700" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-blue-700" />
       </button>
       <button
         onClick={handleNext}
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 md:p-2 shadow hover:bg-white"
+        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 sm:p-2 shadow hover:bg-white"
       >
-        <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-blue-700" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-blue-700" />
       </button>
 
       {/* Dots */}
-      <div className="flex space-x-2 mt-4">
+      <div className="flex space-x-2 mt-3 sm:mt-4">
         {images.map((_, i) => (
           <button
             key={i}
             onClick={() => setIndex(i)}
-            className={`h-2.5 w-2.5 md:h-3 md:w-3 rounded-full transition ${
+            className={`h-2 w-2 sm:h-3 sm:w-3 rounded-full transition ${
               i === index ? "bg-blue-600 scale-125" : "bg-gray-300 hover:bg-gray-400"
             }`}
           />
@@ -83,33 +76,34 @@ function ClinicSlider({ images, interval = 3000 }) {
 export default function About() {
   return (
     <motion.section
-      className="relative w-full"
+      id="about"
+      className="relative w-full overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
     >
       {/* 🏷 About Us Title */}
-      <div className="text-center py-12 bg-white/0">
-        <h1 className="text-4xl md:text-4xl font-extrabold text-gray-800">
+      <div className="text-center py-10 px-4">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800">
           About <span className="text-blue-700">Us</span>
         </h1>
-        <p className="text-gray-600 text-lg mt-2">
+        <p className="text-gray-600 text-base sm:text-lg mt-2">
           Know more about our Doctor and Clinic
         </p>
       </div>
 
       {/* 👨‍⚕️ Doctor Section */}
-      <div className="relative bg-gradient-to-r from-blue-50 via-white to-blue-100 min-h-screen flex items-center py-20">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <div className="bg-gradient-to-r from-blue-50 via-white to-blue-100 py-10 sm:py-20">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
           {/* Doctor Image */}
           <motion.div
-            className="w-full flex justify-center order-1"
+            className="w-full flex justify-center"
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="w-full h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-white/70 backdrop-blur-md p-4">
+            <div className="w-full max-w-[500px] h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl bg-white/70 backdrop-blur-md p-3">
               <img
                 src={doctorImg}
                 alt="Dr. Deepak Bhanudas Mirghe"
@@ -120,67 +114,82 @@ export default function About() {
 
           {/* Doctor Info */}
           <motion.div
-            className="w-full order-2 bg-white/80 backdrop-blur-md rounded-2xl p-10 shadow-xl"
+            className="w-full bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-lg text-center md:text-left"
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl font-extrabold text-gray-800 mb-3">
-              Meet <span className="text-blue-700">Dr. Deepak Bhanudas Mirghe</span>
-            </h2>
-            <p className="text-lg text-blue-600 font-medium mb-6">
-              (BPTH, COMT, MIAP, Fellowship in Neuro Rehabilitation)
-            </p>
-            <p className="text-gray-700 text-lg leading-relaxed mb-6">
-              Dr. Deepak Mirghe is a highly skilled physiotherapist with{" "}
-              <span className="font-semibold">over 10 years of experience</span> in
-              musculoskeletal rehabilitation, sports physiotherapy, and pain management.
-              His patient-first approach ensures faster recovery and long-term wellness.
-            </p>
-            <ul className="space-y-3 text-gray-700 text-lg">
-              <li>✅ Orthopedic & Sports Physiotherapy Expert</li>
-              <li>✅ Certified in Manual Therapy (COMT)</li>
-              <li>✅ Member of Indian Association of Physiotherapists (MIAP)</li>
-              <li>✅ Fellowship in Neuro Rehabilitation</li>
-              <li>✅ Specialized in Post-surgical Care</li>
-              <li>✅ Passionate about Patient Education</li>
-            </ul>
+            {/* Title */}
+            <div className="mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 leading-tight">
+                <span className="block text-blue-700 mb-1">Meet</span>
+                <span className="block text-gray-800 font-extrabold text-3xl sm:text-4xl">
+                  Dr. Deepak Bhanudas Mirghe
+                </span>
+              </h2>
+              <p className="text-blue-600 font-medium mt-2 text-sm sm:text-lg">
+                (BPTH, COMT, MIAP, Fellowship in Neuro Rehabilitation)
+              </p>
+            </div>
+
+            {/* Description */}
+            <div className="text-gray-700 text-base sm:text-lg leading-relaxed space-y-4 text-justify md:text-left">
+              <p>
+                Dr. Deepak Mirghe is a highly skilled physiotherapist with{" "}
+                <span className="font-semibold">over years of experience</span> in
+                musculoskeletal rehabilitation, sports physiotherapy, neuro rahabilitation and pain management.
+              </p>
+              <p>
+                His <span className="font-semibold">patient-first approach</span> ensures
+                personalized care, faster recovery, and long-term wellness for every patient.
+              </p>
+
+              <div className="pt-3">
+                <ul className="space-y-2 text-gray-700">
+                  <li>✅ Orthopedic & Sports Physiotherapy Expert</li>
+                  <li>✅ Certified in Manual Therapy (COMT)</li>
+                  <li>✅ Member of Indian Association of Physiotherapists (MIAP)</li>
+                  <li>✅ Fellowship in Neuro Rehabilitation</li>
+                  <li>✅ Specialized in Post-surgical Care</li>
+                  <li>✅ Passionate about Patient Education</li>
+                </ul>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
 
-      {/* 🌊 Wave Divider */}
+      {/* 🌊 Divider */}
       <svg
-        className="w-full h-20 text-blue-50"
+        className="w-full h-16 text-blue-50"
         viewBox="0 0 1440 320"
         preserveAspectRatio="none"
       >
         <path
           fill="currentColor"
-          d="M0,224L48,218.7C96,213,192,203,288,202.7C384,203,480,213,576,197.3C672,181,768,139,864,149.3C960,160,1056,224,1152,240C1248,256,1344,224,1392,208L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+          d="M0,224L48,218.7C96,213,192,203,288,202.7C384,203,480,213,576,197.3C672,181,768,139,864,149.3C960,160,1056,224,1152,240C1248,256,1344,224,1392,208L1440,192V320H0Z"
         ></path>
       </svg>
 
       {/* 🏥 Clinic Section */}
-      <div className="relative bg-gradient-to-r from-blue-100 via-white to-blue-50 min-h-screen flex items-center py-20">
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <div className="bg-gradient-to-r from-blue-100 via-white to-blue-50 py-10 sm:py-20">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
           {/* Clinic Info */}
           <motion.div
-            className="w-full order-2 md:order-1 bg-white/80 backdrop-blur-md rounded-2xl p-10 shadow-xl"
+            className="order-2 md:order-1 bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-lg text-center md:text-left"
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl font-extrabold text-gray-800 mb-6">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-4">
               About <span className="text-blue-700">Mangalam Physiotherapy Clinic</span>
             </h2>
-            <p className="text-gray-700 text-lg leading-relaxed mb-6">
+            <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-6 text-justify md:text-left">
               At Mangalam Physiotherapy, we provide{" "}
-              <span className="font-semibold">holistic and advanced care</span>.
-              Our modern facilities and patient-focused approach ensure comfort
-              and effective recovery.
+              <span className="font-semibold">holistic and advanced care</span>. Our modern
+              facilities and patient-focused approach ensure comfort and effective recovery.
             </p>
-            <ul className="space-y-3 text-gray-700 text-lg">
+            <ul className="space-y-2 text-gray-700 text-base sm:text-lg">
               <li>🏥 Modern Rehabilitation Facilities</li>
               <li>🤝 Personalized Treatment Plans</li>
               <li>💡 Evidence-based Therapies</li>
@@ -191,7 +200,7 @@ export default function About() {
 
           {/* Clinic Slider */}
           <motion.div
-            className="w-full flex justify-center order-1 md:order-2"
+            className="order-1 md:order-2 flex justify-center"
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
