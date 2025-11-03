@@ -1,16 +1,14 @@
-// server/routes/public.js
+// server/src/Routes/public.js
 import express from "express";
 
 const router = express.Router();
 
-// Simple index for /api
-router.get("/", (_req, res) => {
-  res.json({ message: "Dphysio public API is running" });
-});
-
-// Health check
-router.get("/health", (_req, res) => {
-  res.json({ ok: true, uptime: process.uptime() });
+// Default route for testing
+router.get("/", (req, res) => {
+  res.json({
+    message: "Welcome to Dipak’s Physiotherapy API!",
+    status: "OK",
+  });
 });
 
 export default router;
