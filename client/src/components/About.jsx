@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import doctorImg from "../assets/about.jpeg";
-import clinicImg1 from "../assets/clinic.jpeg";
+import clinicImg1 from "../assets/Clinic.jpeg";
 import clinicImg2 from "../assets/Clinic2.jpeg";
 import clinicImg3 from "../assets/Clinic3.jpeg";
 import clinicImg4 from "../assets/Clinic4.jpeg";
