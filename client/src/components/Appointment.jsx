@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import API_URL from "../api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -30,7 +31,7 @@ export default function Appointment() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5002/api/appointments", form, {
+      const res = await axios.post(`${API_URL}/appointments`, form, {
         headers: { "Content-Type": "application/json" },
       });
 

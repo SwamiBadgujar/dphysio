@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import API_BASE from "../api";
 import { toast } from "react-toastify";
 
 export default function Contact() {
@@ -26,7 +27,7 @@ export default function Contact() {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5002/api/enquiries",
+        `${API_BASE}/enquiries`,
         form,
         { headers: { "Content-Type": "application/json" } }
       );

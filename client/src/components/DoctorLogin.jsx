@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE from "../api";
 
 export default function DoctorLogin({ setToken }) {
   const [email, setEmail] = useState("");
@@ -34,7 +35,7 @@ export default function DoctorLogin({ setToken }) {
     }
 
     try {
-      const res = await axios.post("http://localhost:5002/api/doctor/login", {
+      const res = await axios.post(`${API_BASE}/doctor/login`, {
         email,
         password,
       });

@@ -10,7 +10,7 @@ export default function DoctorDashboard({ token }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_BASE = "http://localhost:5002/api";
+  const API_BASE = import.meta.env.VITE_API_URL;
 
   // --- Fetch appointments & enquiries ---
   useEffect(() => {
