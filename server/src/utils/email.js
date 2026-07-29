@@ -1,53 +1,49 @@
 import nodemailer from "nodemailer";
 
-// Create transporter
+// ===============================
+// Create Gmail Transporter
+// ===============================
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Use SSL for Gmail
+  port: 587,
+  secure: false, // false for TLS (587)
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
 });
 
-// Verify transporter at startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ [Email] Transporter verification failed!");
-    console.error(error); // full error object
-  } else {
-    console.log("✅ [Email] Transporter verified & ready");
-    console.log(`📧 Sender Gmail: ${process.env.EMAIL_USER}`);
-    console.log(`➡️ Clinic Inbox: ${process.env.CLINIC_EMAIL}`);
-  }
-});
-
-// Send a single email
-export const sendEmail = async ({ to, subject, text, html }) => {
-  console.log("\n📨 [sendEmail] Preparing to send...");
-  console.log(`   From: ${process.env.EMAIL_USER}`);
-  console.log(`   To: ${to}`);
-  console.log(`   Subject: ${subject}`);
-
-  // Validate inputs
-  if (!process.env.EMAIL_USER) {
-    throw new Error("EMAIL_USER not configured");
-  }
-  if (!to) {
-    throw new Error("Recipient email is missing");
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
-    throw new Error(`Invalid recipient email: ${to}`);
-  }
-  if (!subject) {
-    throw new Error("Email subject is missing");
-  }
-  if (!text && !html) {
-    throw new Error("Email content is missing");
-  }
-
+// ===============================
+// Verify Transporter
+// ===============================
+(async () => {
   try {
+    await transporter.verify();
+    console.log("✅ Email transporter verified & ready");
+    console.log(`📧 Sender: ${process.env.EMAIL_USER}`);
+    console.log(`📥 Clinic: ${process.env.CLINIC_EMAIL}`);
+  } catch (err) {
+    console.error("❌ Email transporter verification failed");
+    console.error(err);
+  }
+})();
+
+// ===============================
+// Send Single Email
+// ===============================
+export const sendEmail = async ({ to, subject, text, html }) => {
+  try {
+    console.log("\n📨 Sending Email...");
+    console.log("From:", process.env.EMAIL_USER);
+    console.log("To:", to);
+    console.log("Subject:", subject);
+
     const info = await transporter.sendMail({
       from: `"Mangalam Physiotherapy" <${process.env.EMAIL_USER}>`,
       to,
@@ -56,104 +52,127 @@ export const sendEmail = async ({ to, subject, text, html }) => {
       html,
     });
 
-    console.log("✅ [sendEmail] Success!");
-    console.log("   Accepted:", info.accepted);
-    console.log("   Rejected:", info.rejected);
-    console.log("   Response:", info.response);
+    console.log("✅ Email Sent Successfully");
+    console.log("Message ID:", info.messageId);
+    console.log("Accepted:", info.accepted);
+    console.log("Rejected:", info.rejected);
+
     return info;
   } catch (err) {
-    console.error("❌ [sendEmail] Error while sending!");
-    console.error(err); // full SMTP error object
+    console.error("❌ Email sending failed:");
+    console.error(err);
     throw err;
   }
 };
 
-// Send appointment emails (patient + clinic)
-export const sendAppointmentEmails = async (appointment, clinicEmail) => {
-  const { patientName, patientEmail, date, time, phone, message } = appointment;
-
-  console.log("\n📌 [sendAppointmentEmails] Starting email workflow...");
-  console.log("   Appointment data:", {
+// ===============================
+// Send Appointment Emails
+// ===============================
+export const sendAppointmentEmails = async (
+  appointment,
+  clinicEmail = process.env.CLINIC_EMAIL
+) => {
+  const {
     patientName,
     patientEmail,
     phone,
     date,
     time,
     message,
-    clinicEmail,
-  });
+  } = appointment;
+
+  console.log("\n📌 Starting Appointment Email Workflow");
 
   try {
-    // Validate inputs
-    if (!clinicEmail) {
-      throw new Error("Clinic email is missing");
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clinicEmail)) {
-      throw new Error(`Invalid clinic email format: ${clinicEmail}`);
-    }
-    if (!patientName || !date || !time) {
-      throw new Error("Missing required appointment details");
-    }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      throw new Error(`Invalid date format: ${date}`);
-    }
-    if (!/^\d{2}:\d{2}$/.test(time)) {
-      throw new Error(`Invalid time format: ${time}`);
-    }
-
-    // Patient confirmation
+    // -------------------------
+    // Patient Confirmation
+    // -------------------------
     if (patientEmail) {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(patientEmail)) {
-        throw new Error(`Invalid patient email format: ${patientEmail}`);
-      }
-      console.log("➡️ [sendAppointmentEmails] Sending confirmation to patient:", patientEmail);
       await sendEmail({
         to: patientEmail,
         subject: "✅ Appointment Confirmation - Mangalam Physiotherapy",
-        text: `Hello ${patientName}, your appointment is confirmed for ${date} at ${time}.`,
+        text: `Hello ${patientName},
+
+Your appointment has been successfully booked.
+
+Date: ${date}
+Time: ${time}
+
+Thank you for choosing Mangalam Physiotherapy.
+
+Regards,
+Mangalam Physiotherapy`,
         html: `
-          <h2>Appointment Confirmation</h2>
-          <p>Hello <b>${patientName}</b>,</p>
-          <p>Your appointment is confirmed:</p>
-          <ul>
-            <li><b>Date:</b> ${date}</li>
-            <li><b>Time:</b> ${time}</li>
-          </ul>
+          <div style="font-family:Arial,sans-serif">
+            <h2 style="color:#16a34a;">Appointment Confirmed ✅</h2>
+
+            <p>Hello <b>${patientName}</b>,</p>
+
+            <p>Your appointment has been successfully booked.</p>
+
+            <table cellpadding="8">
+              <tr>
+                <td><b>Date</b></td>
+                <td>${date}</td>
+              </tr>
+              <tr>
+                <td><b>Time</b></td>
+                <td>${time}</td>
+              </tr>
+            </table>
+
+            <p>Thank you for choosing <b>Mangalam Physiotherapy</b>.</p>
+          </div>
         `,
       });
-      console.log("✅ [sendAppointmentEmails] Patient confirmation sent");
-    } else {
-      console.log("ℹ️ [sendAppointmentEmails] No patient email provided, skipping.");
+
+      console.log("✅ Patient confirmation email sent");
     }
 
-    // Clinic notification
-    console.log("➡️ [sendAppointmentEmails] Sending notification to clinic:", clinicEmail);
+    // -------------------------
+    // Clinic Notification
+    // -------------------------
     await sendEmail({
       to: clinicEmail,
       subject: `📅 New Appointment - ${patientName}`,
-      text: `Patient: ${patientName}\nPhone: ${phone}\nEmail: ${patientEmail || "N/A"}\nDate: ${date}\nTime: ${time}\nMessage: ${message || "N/A"}`,
+      text: `
+New Appointment Received
+
+Patient: ${patientName}
+Phone: ${phone}
+Email: ${patientEmail}
+
+Date: ${date}
+Time: ${time}
+
+Message:
+${message || "No message"}
+`,
       html: `
-        <h2>New Appointment</h2>
-        <ul>
-          <li><b>Patient:</b> ${patientName}</li>
-          <li><b>Email:</b> ${patientEmail || "N/A"}</li>
-          <li><b>Phone:</b> ${phone}</li>
-          <li><b>Date:</b> ${date}</li>
-          <li><b>Time:</b> ${time}</li>
-          <li><b>Message:</b> ${message || "N/A"}</li>
-        </ul>
+        <div style="font-family:Arial,sans-serif">
+          <h2>New Appointment</h2>
+
+          <table cellpadding="8">
+            <tr><td><b>Patient</b></td><td>${patientName}</td></tr>
+            <tr><td><b>Email</b></td><td>${patientEmail}</td></tr>
+            <tr><td><b>Phone</b></td><td>${phone}</td></tr>
+            <tr><td><b>Date</b></td><td>${date}</td></tr>
+            <tr><td><b>Time</b></td><td>${time}</td></tr>
+            <tr><td><b>Message</b></td><td>${message || "No message"}</td></tr>
+          </table>
+        </div>
       `,
     });
-    console.log("✅ [sendAppointmentEmails] Clinic notification sent");
 
-    console.log("🎉 [sendAppointmentEmails] All emails sent successfully!");
+    console.log("✅ Clinic notification email sent");
+    console.log("🎉 Appointment email workflow completed");
+
     return true;
   } catch (err) {
-    console.error("❌ [sendAppointmentEmails] Failed to complete workflow!");
-    console.error(err); // full error object
+    console.error("❌ Appointment email workflow failed");
+    console.error(err);
     throw err;
   }
 };
 
-// Export transporter for debugging if needed
 export default transporter;
