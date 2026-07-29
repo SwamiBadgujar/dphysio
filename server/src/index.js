@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 // Routes
 import publicRoutes from './Routes/public.js';
 import appointmentRoutes from './Routes/appointmentRoutes.js';
-import doctorRoutes from './Routes/doctorRoutes.js'; 
+import doctorRoutes from './Routes/DoctorRoutes.js'; 
 import enquiryRoutes from './Routes/enquiriesRoutes.js'; // 👈 NEW route for contact form
 
 // Utils
