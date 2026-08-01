@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { FaRobot } from "react-icons/fa"; // Chatbot icon
 import { Link } from "react-router-dom"; // React Router Link
 import heroBg from "../assets/knee-pain-physiotherapy-clinic.jpg"; // ensure exists
 
@@ -49,41 +48,6 @@ export default function Hero() {
             </motion.a>
           </div>
         </motion.div>
-
-        {/* Floating action buttons: WhatsApp, Call, Chatbot */}
-        <div className="fixed right-6 bottom-6 flex flex-col gap-3 z-50">
-          {/* WhatsApp */}
-          <motion.a
-            href="https://wa.me/917744898939"
-            target="_blank"
-            rel="noreferrer"
-            className="bg-green-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition transform"
-            animate={{ y: [0, -6, 0] }}
-            transition={{ repeat: Infinity, duration: 1.6 }}
-          >
-            💬
-          </motion.a>
-
-          {/* Call */}
-          <motion.a
-            href="tel:+917744898939"
-            className="bg-blue-700 text-white p-3 rounded-full shadow-lg hover:scale-110 transition transform"
-            animate={{ y: [0, -6, 0] }}
-            transition={{ repeat: Infinity, duration: 1.6, delay: 0.2 }}
-          >
-            📞
-          </motion.a>
-
-          {/* Chatbot */}
-          <motion.a
-            href="#chatbot"
-            className="bg-purple-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition transform"
-            animate={{ y: [0, -6, 0] }}
-            transition={{ repeat: Infinity, duration: 1.6, delay: 0.4 }}
-          >
-            <FaRobot size={20} />
-          </motion.a>
-        </div>
       </motion.div>
     </section>
   );

@@ -79,8 +79,8 @@ export default function App() {
 
         <Footer />
 
-        {/* Floating Chatbot */}
-        <div className="fixed bottom-6 right-6 z-50">
+        {/* Global Floating Action Stack: WhatsApp, Call, Chatbot */}
+        <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3">
           <Chatbot />
         </div>
 
